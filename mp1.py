@@ -1,9 +1,10 @@
 #### TO DO (mga kulang pa):
 #### 1. comments / documentation sa code
 #### 2. cleaning of code / mas gawing maayos and concise
-#### 3. mas gawing descriptive yung variables
-#### 4. features
-#### 5. read.me
+#### 3. pytest module with asserts
+#### 4. mas gawing descriptive yung variables
+#### 5. features
+#### 6. read.me
 
 import os
 import subprocess
