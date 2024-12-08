@@ -1,10 +1,7 @@
 #### TO DO (mga kulang pa):
-#### 1. comments / documentation sa code
-#### 2. cleaning of code / mas gawing maayos and concise
-#### 3. pytest module with asserts
-#### 4. mas gawing descriptive yung variables
-#### 5. features
-#### 6. read.me
+#### 1. mas gawing descriptive yung variables
+#### 2. features
+#### 3. read.me
 
 import os
 import subprocess
@@ -12,7 +9,7 @@ import sys
 import time
 from argparse import ArgumentParser
 
-def main():
+def main(): #Handles the interaction with the player
     parser = ArgumentParser()
     parser.add_argument('stage_file')
     args = parser.parse_args()
@@ -48,26 +45,29 @@ def main():
     print(f"Points: {points + (num_moves) * 2}")
     
 
-def load_level(filename):
+def load_level(filename): #Reads the information located in the .in file
     with open(filename, encoding="utf-8") as file:
         num_rows = int(file.readline().strip())
         num_moves = int(file.readline().strip())
         grid = [list(file.readline().strip()) for _ in range(num_rows)]
     return grid, num_moves, 0
 
-def display_grid(grid):
+def display_grid(grid): #Displays the grid
     for row in grid:
         print(''.join(row))
 
-def clear_screen():
+def clear_screen(): #Clears the screen
     if sys.stdout.isatty():
         clear_cmd = 'cls' if os.name == 'nt' else 'clear'
         subprocess.run([clear_cmd])
 
-def separate_moves(args):
-    return [move.lower() for move in args if move.lower() in 'lrfb']
+def separate_moves(args): #Accepts valid moves and discards irrelevant inputs
+    if isinstance(args, str):
+        return [move.lower() for move in args if move.lower() in 'lrfb']
+    else:
+        return []
 
-def apply_move(grid, move, points):
+def apply_move(grid, move, points): #Links the egg's movements within the grid to the inputs
     if move == 'l':
         grid, points = tilt_grid(grid, points, dx=0, dy=-1)
     elif move == 'r':
@@ -78,7 +78,7 @@ def apply_move(grid, move, points):
         grid, points = tilt_grid(grid, points, dx=1, dy=0)
     return grid, points
 
-def tilt_grid(grid, points, dx, dy):
+def tilt_grid(grid, points, dx, dy): #Handles the two kinds of movements in the grid: from row to row, and from column to column
     num_rows = len(grid)
     num_cols = len(grid[0])
     moved = True
@@ -123,7 +123,7 @@ def tilt_grid(grid, points, dx, dy):
 
     return grid, points
 
-def step_shift_eggs_with_rules(line, points, direction):
+def step_shift_eggs_with_rules(line, points, direction): #Moves the egg from left to right within the grid
     empty_char = '🟩' 
     frying_pan = '🍳'
     nest = '🪹'
@@ -168,4 +168,74 @@ def step_shift_eggs_with_rules(line, points, direction):
 
 if __name__ == "__main__":
     main()
+
+def test_():
+    assert separate_moves('ZZZZZF') == ['f']
+    assert separate_moves('') == []
+    assert separate_moves('abcdefghijklmnopqrstuvwxyz') == ['b', 'f', 'l', 'r']
+    assert separate_moves(1) == []
+    assert separate_moves('lLfFrRbB') == ['l', 'l', 'f', 'f', 'r', 'r', 'b', 'b']
+
+    assert step_shift_eggs_with_rules('🟩🥚🟩', 0, 'left') == ('🥚🟩🟩', True, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🟩', 0, 'right') == ('🟩🟩🥚', True, 0)
+    assert step_shift_eggs_with_rules('🍳🥚🟩', 0, 'left') == ('🍳🟩🟩', True, -5)
+    assert step_shift_eggs_with_rules('🟩🥚🍳', 0, 'right') == ('🟩🟩🍳', True, -5)
+    assert step_shift_eggs_with_rules('🪹🥚🟩', 0, 'left') == ('🪺🟩🟩', True, 10)
+    assert step_shift_eggs_with_rules('🟩🥚🪹', 0, 'right') == ('🟩🟩🪺', True, 10)
+    assert step_shift_eggs_with_rules('🪺🥚🟩', 0, 'left') == ('🪺🥚🟩', False, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🪺', 0, 'right') == ('🟩🥚🪺', False, 0)
+    assert step_shift_eggs_with_rules('🥚🥚🟩', 0, 'left') == ('🥚🥚🟩', False, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🥚', 0, 'right') == ('🟩🥚🥚', False, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🥚🟩', 0, 'left') == ('🥚🥚🟩🟩', True, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🥚🟩', 0, 'right') == ('🟩🟩🥚🥚', True, 0)
+    assert step_shift_eggs_with_rules('🪹🥚🥚🟩', 0, 'left') == ('🪺🥚🟩🟩', True, 10)
+    assert step_shift_eggs_with_rules('🟩🥚🥚🪹', 0, 'right') == ('🟩🟩🥚🪺', True, 10)
+    assert step_shift_eggs_with_rules('🪺🥚🥚🟩', 0, 'left') == ('🪺🥚🥚🟩', False, 0)
+    assert step_shift_eggs_with_rules('🟩🥚🥚🪺', 0, 'right') == ('🟩🥚🥚🪺', False, 0)
+    assert step_shift_eggs_with_rules('🍳🥚🥚🟩', 0, 'left') == ('🍳🥚🟩🟩', True, -5)
+    assert step_shift_eggs_with_rules('🟩🥚🥚🍳', 0, 'right') == ('🟩🟩🥚🍳', True, -5)
+    assert step_shift_eggs_with_rules('', 0, 'left') == ('', False, 0)
+    assert step_shift_eggs_with_rules('', 0, 'right') == ('', False, 0)
+
+    assert tilt_grid([['🟩'], ['🟩'], ['🥚'],], 0, -1, 0) == ([['🥚'], ['🟩'], ['🟩']], 0)
+    assert tilt_grid([['🪹'], ['🟩'], ['🥚'],], 0, -1, 0) == ([['🪺'], ['🟩'], ['🟩']], 10)
+    assert tilt_grid([['🍳'], ['🟩'], ['🥚'],], 0, -1, 0) == ([['🍳'], ['🟩'], ['🟩']], -5)
+    assert tilt_grid([['🥚'], ['🟩'], ['🥚'],], 0, -1, 0) == ([['🥚'], ['🥚'], ['🟩']], 0)
+    assert tilt_grid([['🪺'], ['🟩'], ['🥚'],], 0, -1, 0) == ([['🪺'], ['🥚'], ['🟩']], 0)
+    assert tilt_grid([['🥚'], ['🟩'], ['🟩'],], 0, 1, 0) == ([['🟩'], ['🟩'], ['🥚']], 0)
+    assert tilt_grid([['🥚'], ['🟩'], ['🪹'],], 0, 1, 0) == ([['🟩'], ['🟩'], ['🪺']], 10)
+    assert tilt_grid([['🥚'], ['🟩'], ['🍳'],], 0, 1, 0) == ([['🟩'], ['🟩'], ['🍳'], ], -5)
+    assert tilt_grid([['🥚'], ['🟩'], ['🥚'],], 0, 1, 0) == ([['🟩'], ['🥚'], ['🥚']], 0)
+    assert tilt_grid([['🥚'], ['🟩'], ['🪺'],], 0, 1, 0) == ([['🟩'], ['🥚'], ['🪺']], 0)
+    assert tilt_grid([['🟩', '🟩', '🥚']], 0, 0, -1) == ([['🥚', '🟩', '🟩']], 0)
+    assert tilt_grid([['🪹', '🟩', '🥚']], 0, 0, -1) == ([['🪺', '🟩', '🟩']], 10)
+    assert tilt_grid([['🍳', '🟩', '🥚']], 0, 0, -1) == ([['🍳', '🟩', '🟩']], -5)
+    assert tilt_grid([['🥚', '🟩', '🥚']], 0, 0, -1) == ([['🥚', '🥚', '🟩']], 0)
+    assert tilt_grid([['🪺', '🟩', '🥚']], 0, 0, -1) == ([['🪺', '🥚', '🟩']], 0)
+    assert tilt_grid([['🥚', '🟩', '🟩']], 0, 0, 1) == ([['🟩', '🟩', '🥚']], 0)
+    assert tilt_grid([['🥚', '🟩', '🪹']], 0, 0, 1) == ([['🟩', '🟩', '🪺']], 10)
+    assert tilt_grid([['🥚', '🟩', '🍳']], 0, 0, 1) == ([['🟩', '🟩', '🍳']], -5)
+    assert tilt_grid([['🥚', '🟩', '🥚']], 0, 0, 1) == ([['🟩', '🥚', '🥚']], 0)
+    assert tilt_grid([['🥚', '🟩', '🪺']], 0, 0, 1) == ([['🟩', '🥚', '🪺']], 0)
+
+    assert apply_move([['🟩', '🟩', '🥚']], 'l', 0) == ([['🥚', '🟩', '🟩']], 0)
+    assert apply_move([['🪹', '🟩', '🥚']], 'l', 0) == ([['🪺', '🟩', '🟩']], 10)
+    assert apply_move([['🍳', '🟩', '🥚']], 'l', 0) == ([['🍳', '🟩', '🟩']], -5)
+    assert apply_move([['🥚', '🟩', '🥚']], 'l', 0) == ([['🥚', '🥚', '🟩']], 0)
+    assert apply_move([['🪺', '🟩', '🥚']], 'l', 0) == ([['🪺', '🥚', '🟩']], 0)
+    assert apply_move([['🥚', '🟩', '🟩']], 'r', 0) == ([['🟩', '🟩', '🥚']], 0)
+    assert apply_move([['🥚', '🟩', '🪹']], 'r', 0) == ([['🟩', '🟩', '🪺']], 10)
+    assert apply_move([['🥚', '🟩', '🍳']], 'r', 0) == ([['🟩', '🟩', '🍳']], -5)
+    assert apply_move([['🥚', '🟩', '🥚']], 'r', 0) == ([['🟩', '🥚', '🥚']], 0)
+    assert apply_move([['🥚', '🟩', '🪺']], 'r', 0) == ([['🟩', '🥚', '🪺']], 0)
+    assert apply_move([['🟩'], ['🟩'], ['🥚'],], 'f', 0) == ([['🥚'], ['🟩'], ['🟩']], 0)
+    assert apply_move([['🪹'], ['🟩'], ['🥚'],], 'f', 0) == ([['🪺'], ['🟩'], ['🟩']], 10)
+    assert apply_move([['🍳'], ['🟩'], ['🥚'],], 'f', 0) == ([['🍳'], ['🟩'], ['🟩']], -5)
+    assert apply_move([['🥚'], ['🟩'], ['🥚'],], 'f', 0) == ([['🥚'], ['🥚'], ['🟩']], 0)
+    assert apply_move([['🪺'], ['🟩'], ['🥚'],], 'f', 0) == ([['🪺'], ['🥚'], ['🟩']], 0)
+    assert apply_move([['🥚'], ['🟩'], ['🟩'],], 'b', 0) == ([['🟩'], ['🟩'], ['🥚']], 0)
+    assert apply_move([['🥚'], ['🟩'], ['🪹'],], 'b', 0) == ([['🟩'], ['🟩'], ['🪺']], 10)
+    assert apply_move([['🥚'], ['🟩'], ['🍳'],], 'b', 0) == ([['🟩'], ['🟩'], ['🍳']], -5)
+    assert apply_move([['🥚'], ['🟩'], ['🥚'],], 'b', 0) == ([['🟩'], ['🥚'], ['🥚']], 0)
+    assert apply_move([['🥚'], ['🟩'], ['🪺'],], 'b', 0) == ([['🟩'], ['🥚'], ['🪺']], 0)
             
