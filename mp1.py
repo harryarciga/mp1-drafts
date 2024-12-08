@@ -1,8 +1,3 @@
-#### TO DO (mga kulang pa):
-#### 1. mas gawing descriptive yung variables
-#### 2. features
-#### 3. read.me
-
 import os
 import subprocess
 import sys
