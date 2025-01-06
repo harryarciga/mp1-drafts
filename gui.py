@@ -30,8 +30,8 @@ loading_5_light = pygame.image.load('images/loading_5_light.png')
 
 settings_light = pygame.image.load('images/settings_light.png')
 tutorials_light = pygame.image.load('images/tutorials_light.png')
+leaderboard_light = pygame.image.load('images/leaderboard_light.png')
 control_keys_light = pygame.image.load('images/control_keys_light.png')
-#help_light = pygame.image.load('help_light.png')
 credits_light = pygame.image.load('images/credits_light.png')
 
 sure_light = pygame.image.load('images/sure_light.png')
@@ -49,9 +49,10 @@ loading_5_dark = pygame.image.load('images/loading_5_dark.png')
 
 settings_dark = pygame.image.load('images/settings_dark.png')
 tutorials_dark = pygame.image.load('images/tutorials_dark.png')
+leaderboard_dark = pygame.image.load('images/leaderboard_dark.png')
 control_keys_dark = pygame.image.load('images/control_keys_dark.png')
-#help_light = pygame.image.load('help_light.png')
 credits_dark = pygame.image.load('images/credits_dark.png')
+
 sure_dark = pygame.image.load('images/sure_dark.png')
 
 
@@ -81,17 +82,28 @@ transparent_main_menu_levels_button = pygame.Surface((305,60), pygame.SRCALPHA)
 
 #Settings Button
 transparent_tutorial_button = pygame.Surface((305,60), pygame.SRCALPHA)
-#transparent_tutorial_button.fill((255,0,0,128))
+transparent_tutorial_button.fill((255,0,0,128))
+
+transparent_leaderboard_button = pygame.Surface((305,60), pygame.SRCALPHA)
+transparent_leaderboard_button.fill((0,127,127,128))
+
 transparent_control_keys_button = pygame.Surface((305,60), pygame.SRCALPHA)
-#transparent_control_keys_button.fill((255,0,0,128))
+transparent_control_keys_button.fill((255,127,0,128))
+
 transparent_dark_mode_button = pygame.Surface((305,60), pygame.SRCALPHA)
-#transparent_dark_mode_button.fill((255,0,0,128))
+transparent_dark_mode_button.fill((255,255,0,128))
+
 transparent_credits_button = pygame.Surface((305,60), pygame.SRCALPHA)
-#transparent_credits_button.fill((255,0,0,128))
+transparent_credits_button.fill((0,127,127,128))
+
 transparent_main_menu_settings_button = pygame.Surface((305,60), pygame.SRCALPHA)
-#transparent_main_menu_settings_button.fill((255,0,0,128))
+transparent_main_menu_settings_button.fill((0,0,255,128))
+
+
 transparent_back_to_settings_button = pygame.Surface((305,60), pygame.SRCALPHA)
 #transparent_back_to_settings_button.fill((255,0,0,128))
+
+
 
 #Exit_Game Buttons
 transparent_yes_button = pygame.Surface((260,80), pygame.SRCALPHA)
@@ -290,7 +302,7 @@ def loading(file, mode = "light", tutorials = "no"):
                 screen.blit(loading_4_dark,(0,0))
                 pygame.display.flip()
                 pygame.time.wait(5000)
-                if tutorials != "no":
+                if tutorials != "no" :
                     game.start_gui_with_level("tutorial4.in", mode)
                 else: 
                     game.start_gui_with_level("level4.in", mode)
@@ -344,16 +356,20 @@ def settings(mode = "light"):
 
         position_x, position_y = pygame.mouse.get_pos()
  
-        tutorial_button = pygame.Rect(590, 255, 305, 60)
-        control_keys_button = pygame.Rect(590, 330, 305, 60)
-        dark_or_day_mode_button = pygame.Rect(595, 405, 305, 60)
-        credits_button = pygame.Rect(590, 490, 305, 60)
-        main_menu_settings_button = pygame.Rect(590, 575, 305, 60)
+        tutorial_button = pygame.Rect(590, 210, 305, 60)
+        leaderboard_button = pygame.Rect(590, 285, 305, 60)
+        control_keys_button = pygame.Rect(590, 375, 305, 60)
+        dark_or_day_mode_button = pygame.Rect(595, 450, 305, 60)
+        credits_button = pygame.Rect(590, 535, 305, 60)
+        main_menu_settings_button = pygame.Rect(590, 615, 305, 60)
 
         
         if tutorial_button.collidepoint((position_x, position_y)):
             if click:
                 levels(mode, "yes")
+        if leaderboard_button.collidepoint((position_x, position_y)):
+            if click:
+                leaderboard(mode)
         if control_keys_button.collidepoint((position_x, position_y)):
             if click:
                 control_keys_or_credits(mode)
@@ -370,11 +386,12 @@ def settings(mode = "light"):
             if click:
                 main_menu(mode)
 
-        screen.blit(transparent_tutorial_button, (590, 255))
-        screen.blit(transparent_control_keys_button, (590, 330))
-        screen.blit(transparent_dark_mode_button, (595, 405))
-        screen.blit(transparent_control_keys_button, (590, 490))
-        screen.blit(transparent_main_menu_settings_button, (590, 575))
+        screen.blit(transparent_tutorial_button, (590, 210))
+        screen.blit(transparent_leaderboard_button, (590, 285))
+        screen.blit(transparent_control_keys_button, (590, 375))
+        screen.blit(transparent_dark_mode_button, (595, 450))
+        screen.blit(transparent_control_keys_button, (590, 535))
+        screen.blit(transparent_main_menu_settings_button, (590, 615))
 
 
 
@@ -392,6 +409,82 @@ def settings(mode = "light"):
  
         pygame.display.update()
         mainClock.tick(60)
+
+def leaderboard(mode="light"):
+    click = False
+    running = True
+    active_level = None  # Keeps track of the currently selected level
+    scores = None        # Stores the scores of the active level
+
+    while running:
+        if mode == "light":
+            screen.blit(leaderboard_light, (0, 0))
+        else:
+            screen.blit(leaderboard_dark, (0, 0))
+
+        position_x, position_y = pygame.mouse.get_pos()
+
+        leaderboard_level1_button = pygame.Rect(575, 248, 305, 60)
+        leaderboard_level2_button = pygame.Rect(575, 325, 305, 60)
+        leaderboard_level3_button = pygame.Rect(580, 400, 305, 60)
+        leaderboard_level4_button = pygame.Rect(575, 475, 305, 60)
+        leaderboard_level5_button = pygame.Rect(580, 550, 305, 60)
+        leaderboard_back_to_settings_button = pygame.Rect(580, 625, 305, 60)
+
+        # Check for button clicks and update active level and scores
+        if leaderboard_level1_button.collidepoint((position_x, position_y)) and click:
+            active_level = 'level1.in'
+        if leaderboard_level2_button.collidepoint((position_x, position_y)) and click:
+            active_level = 'level2.in'
+        if leaderboard_level3_button.collidepoint((position_x, position_y)) and click:
+            active_level = 'level3.in'
+        if leaderboard_level4_button.collidepoint((position_x, position_y)) and click:
+            active_level = 'level4.in'
+        if leaderboard_level5_button.collidepoint((position_x, position_y)) and click:
+            active_level = 'level5.in'
+        if leaderboard_back_to_settings_button.collidepoint((position_x, position_y)) and click:
+            settings(mode)
+
+        # Load and display scores for the active level
+        if active_level:
+            first_score, second_score, third_score = game.get_leaderboard_scores(active_level)
+            display_scores(first_score, second_score, third_score)
+
+        # Display transparent buttons
+        screen.blit(transparent_tutorial_button, (575, 248))
+        screen.blit(transparent_leaderboard_button, (575, 325))
+        screen.blit(transparent_control_keys_button, (580, 400))
+        screen.blit(transparent_dark_mode_button, (575, 475))
+        screen.blit(transparent_control_keys_button, (580, 550))
+        screen.blit(transparent_main_menu_settings_button, (580, 625))
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1: 
+                    click = True
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    main_menu(mode)
+
+        pygame.display.update()
+        mainClock.tick(60)
+
+
+
+def display_scores(first_score, second_score, third_score):
+    font = pygame.font.Font(None, 36)
+
+    first_score_text = font.render(f"{first_score}", True, (121, 78, 7))
+    second_score_text = font.render(f"{second_score}", True, (121, 78, 7))
+    third_score_text = font.render(f"{third_score}", True, (121, 78, 7))
+
+    screen.blit(first_score_text, (275,355))
+    screen.blit(second_score_text, (275,395))
+    screen.blit(third_score_text, (275,437))
 
 def control_keys_or_credits(mode = "light", use = "control_keys"): 
     running = True
