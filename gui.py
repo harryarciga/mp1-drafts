@@ -17,7 +17,6 @@ pygame.display.set_icon(icon)
 screen = pygame.display.set_mode((960, 768),0,32)
 
 
-
 #These are the images (LIGHT mode)
 main_menu_light = pygame.image.load('images/main_menu_light.png')
 
@@ -54,8 +53,6 @@ control_keys_dark = pygame.image.load('images/control_keys_dark.png')
 credits_dark = pygame.image.load('images/credits_dark.png')
 
 sure_dark = pygame.image.load('images/sure_dark.png')
-
-
 
 
 #Main Menu Buttons
@@ -104,7 +101,6 @@ transparent_back_to_settings_button = pygame.Surface((305,60), pygame.SRCALPHA)
 #transparent_back_to_settings_button.fill((255,0,0,128))
 
 
-
 #Exit_Game Buttons
 transparent_yes_button = pygame.Surface((260,80), pygame.SRCALPHA)
 #transparent_yes_button.fill((255,0,0,128))
@@ -112,8 +108,7 @@ transparent_no_button = pygame.Surface((260,80), pygame.SRCALPHA)
 #transparent_no_button.fill((255,0,0,128))
 
 
-
-def main_menu(mode = 'light'):
+def main_menu(mode='light'):
     click = False
     while True:
         if mode == "light":
@@ -159,7 +154,7 @@ def main_menu(mode = 'light'):
         mainClock.tick(60)
 
 
-def levels(mode = "light", tutorials = "no"):
+def levels(mode="light", tutorials="no"):
     click = False
     running = True
     while running:
@@ -181,7 +176,6 @@ def levels(mode = "light", tutorials = "no"):
         level5_button = pygame.Rect(580, 550, 305, 60)
         main_menu_levels_button = pygame.Rect(580, 625, 305, 60)
 
-        
         if level1_button.collidepoint((position_x, position_y)):
             if click:
                 loading(1, mode, tutorials)
@@ -212,7 +206,6 @@ def levels(mode = "light", tutorials = "no"):
         screen.blit(transparent_level5_button, (580, 550))
         screen.blit(transparent_main_menu_levels_button, (580, 625))
 
-
         click = False
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -232,7 +225,7 @@ def levels(mode = "light", tutorials = "no"):
         mainClock.tick(60)
 
 
-def loading(file, mode = "light", tutorials = "no"):
+def loading(file, mode="light", tutorials="no"):
     running = True
     while running:
         if file == 1:
@@ -278,7 +271,6 @@ def loading(file, mode = "light", tutorials = "no"):
                     game.start_gui_with_level("tutorial3.in")
                 else: 
                     game.start_gui_with_level("level3.in")
-
             else:
                 screen.blit(loading_3_dark,(0,0))
                 pygame.display.flip()
@@ -297,7 +289,6 @@ def loading(file, mode = "light", tutorials = "no"):
                     game.start_gui_with_level("tutorial4.in")
                 else: 
                     game.start_gui_with_level("level4.in")
-
             else:
                 screen.blit(loading_4_dark,(0,0))
                 pygame.display.flip()
@@ -316,7 +307,6 @@ def loading(file, mode = "light", tutorials = "no"):
                     game.start_gui_with_level("tutorial5.in")
                 else: 
                     game.start_gui_with_level("level5.in")
-
             else:
                 screen.blit(loading_5_dark,(0,0))
                 pygame.display.flip()
@@ -325,7 +315,6 @@ def loading(file, mode = "light", tutorials = "no"):
                     game.start_gui_with_level("tutorial5.in", mode)
                 else: 
                     game.start_gui_with_level("level5.in", mode)
-
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -345,7 +334,7 @@ def loading(file, mode = "light", tutorials = "no"):
         mainClock.tick(60)
 
  
-def settings(mode = "light"):
+def settings(mode="light"):
     click = False
     running = True
     while running:
@@ -362,8 +351,7 @@ def settings(mode = "light"):
         dark_or_day_mode_button = pygame.Rect(595, 450, 305, 60)
         credits_button = pygame.Rect(590, 535, 305, 60)
         main_menu_settings_button = pygame.Rect(590, 615, 305, 60)
-
-        
+     
         if tutorial_button.collidepoint((position_x, position_y)):
             if click:
                 levels(mode, "yes")
@@ -392,9 +380,7 @@ def settings(mode = "light"):
         screen.blit(transparent_dark_mode_button, (595, 450))
         screen.blit(transparent_control_keys_button, (590, 535))
         screen.blit(transparent_main_menu_settings_button, (590, 615))
-
-
-
+     
         click = False
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -409,6 +395,7 @@ def settings(mode = "light"):
  
         pygame.display.update()
         mainClock.tick(60)
+
 
 def leaderboard(mode="light"):
     click = False
@@ -474,7 +461,6 @@ def leaderboard(mode="light"):
         mainClock.tick(60)
 
 
-
 def display_scores(first_score, second_score, third_score):
     font = pygame.font.Font(None, 36)
 
@@ -486,7 +472,8 @@ def display_scores(first_score, second_score, third_score):
     screen.blit(second_score_text, (275,395))
     screen.blit(third_score_text, (275,437))
 
-def control_keys_or_credits(mode = "light", use = "control_keys"): 
+
+def control_keys_or_credits(mode="light", use="control_keys"): 
     running = True
     click = False
     while running:
