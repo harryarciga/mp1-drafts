@@ -9,22 +9,30 @@ def main(): #Handles the interaction with the player
     parser.add_argument('stage_file')
     args = parser.parse_args()
 
-
     grid, num_moves, points = load_level(args.stage_file)
-    print(f"num of moves: {num_moves}")
     prev_moves = []
 
 
-    while num_moves > 0 and (any('🥚' in row for row in grid) and any('🪹' in row for row in grid)) :
+    while num_moves > 0 and (any('🥚' in row for row in grid) and any('🪹' in row for row in grid)):
         clear_screen()
         display_grid(grid)
+        #print(type(args.stage_file))
+        print(f"===============\nTo see the Top 3 high scores (leaderboard) for this grid, you may click the \'H\' key on your keyboard. Note that the high scores will not be shown if the input is \'RHL\', \'LH\', or any variants where \'H\' is together with other symbols in the input.\n===============")
         print(f"Previous moves: {''.join(prev_moves)}")
         print(f"Remaining moves: {num_moves}")
         print(f"Points: {points}")
 
         directions = input("Enter move/s: ")
+        if directions == "H" or directions == "h":
+            first_score, second_score, third_score = get_leaderboard_scores(args.stage_file)
+            print(f"""===============\nLeaderboard for this level:\n
+    1st: {first_score}
+    2nd: {second_score}
+    3rd: {third_score}
+            """)
+            input("Press any key to return to the game.")
+            
         valid_moves = separate_moves(directions)
-
         for move in valid_moves:
             if num_moves == 0:
                 break
@@ -40,7 +48,9 @@ def main(): #Handles the interaction with the player
     if any('🪹' in row for row in grid):
         print(f"Points: {points}")
     else:
-        print(f"Points: {points + (num_moves) * 2}")
+        points = points + (num_moves) * 2
+        print(f"Points: {points}")
+    change_leaderboard(args.stage_file, points)
     
 
 def load_level(filename): #Reads the information located in the .in file
@@ -65,6 +75,18 @@ def separate_moves(args): #Accepts valid moves and discards irrelevant inputs
     else:
         return []
 
+def get_leaderboard_scores(filename): #This reads the leaderboard related to the file opened in the terminal
+    leaderboard_file = 'hs_mp1_' + filename
+    try:
+        with open(leaderboard_file, encoding="utf-8") as file:
+            first = int(file.readline().strip())
+            second = int(file.readline().strip())
+            third = int(file.readline().strip())
+        return first, second, third
+    except (ValueError, FileNotFoundError) as e:
+        print(f"Cannot read the leaderboard file: {e}")
+        return
+  
 def apply_move(grid, move, points): #Links the egg's movements within the grid to the inputs
     if move == 'l':
         grid, points = tilt_grid(grid, points, dx=0, dy=-1)
@@ -162,6 +184,14 @@ def step_shift_eggs_with_rules(line, points, direction): #Moves the egg from lef
                     moved = True
 
     return ''.join(line_list), moved, points
+
+def change_leaderboard(filename, new_score):
+    first_score, second_score, third_score = get_leaderboard_scores(filename)
+    scores = [first_score, second_score, third_score, new_score]
+    scores = sorted(scores, reverse=True)[:3]
+    with open('hs_mp1_' + filename, 'w', encoding="utf-8") as file:
+        for score in scores:
+            file.write(f"{score}\n")
 
 
 if __name__ == "__main__":
