@@ -8,9 +8,9 @@ class Moves:
     BACKWARD: str = 'b' 
 
 class Board:
-	WALL: str = '🧱'
-	GRASS: str = '🟩' 
-	PAN: str = '🍳'
-	EGG: str = '🥚'
-	EMPTYNEST: str = '🪹'
-	FULLNEST: str = '🪺'
+    WALL: str = '🧱'
+    GRASS: str = '🟩' 
+    PAN: str = '🍳'
+    EGG: str = '🥚'
+    EMPTYNEST: str = '🪹'
+    FULLNEST: str = '🪺'
