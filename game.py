@@ -51,6 +51,17 @@ def load_level(filename):
         grid = [list(file.readline().strip()) for _ in range(num_rows)]
     return grid, num_moves, 0
 
+def get_leaderboard_scores(filename): #This reads the leaderboard related to the file opened in the terminal
+    leaderboard_file = 'hs_gui_' + filename
+    try:
+        with open(leaderboard_file, encoding="utf-8") as file:
+            first = int(file.readline().strip())
+            second = int(file.readline().strip())
+            third = int(file.readline().strip())
+        return first, second, third
+    except (ValueError, FileNotFoundError) as e:
+        print(f"Cannot read the leaderboard file: {e}")
+        return
 
 def apply_move(grid, move, points):
     prev_grid = [row[:] for row in grid]  
@@ -151,10 +162,10 @@ def step_shift_eggs_with_rules(line, points, direction):
 
     return ''.join(line_list), moved, points
 
-def is_game_over(grid):
+def is_game_over(grid, num_moves):
     empty_nests = sum(row.count('🪹') for row in grid)
     eggs = sum(row.count('🥚') for row in grid)
-    return empty_nests == 0 or eggs == 0
+    return empty_nests == 0 or eggs == 0 or num_moves == 0
 
 def check_if_win_or_lose(grid):
     empty_nests = sum(row.count('🪹') for row in grid)
@@ -163,13 +174,22 @@ def check_if_win_or_lose(grid):
     else:
         return False
 
+def change_leaderboard(filename, new_score):
+    first_score, second_score, third_score = get_leaderboard_scores(filename)
+    scores = [first_score, second_score, third_score, new_score]
+    scores = sorted(scores, reverse=True)[:3]
+    with open('hs_gui_' + filename, 'w', encoding="utf-8") as file:
+        for score in scores:
+            file.write(f"{score}\n")
+
+
 def start_gui_with_level(filename, mode="light"):
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Egg Roll")
     clock = pygame.time.Clock()
 
-    # Load assets
+
     assets = load_assets()
 
     click = False
@@ -177,7 +197,6 @@ def start_gui_with_level(filename, mode="light"):
     grid, num_moves, points = load_level(filename)
     prev_moves = []
 
-    
     while num_moves > 0:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -186,7 +205,9 @@ def start_gui_with_level(filename, mode="light"):
             elif event.type == KEYDOWN:
                 valid_move = False
                 if event.key == K_DELETE:
-                    start_gui_with_level(filename, mode)
+                    grid, num_moves, points = load_level(filename)
+                    prev_moves = []
+                    continue
                 elif event.key == K_UP or event.key == K_f:
                     grid, points, valid_move = apply_move(grid, 'f', points)
                     if valid_move:
@@ -207,60 +228,59 @@ def start_gui_with_level(filename, mode="light"):
                     num_moves -= 1
 
 
-        # Draw everything
         if mode == "light":
             screen.blit(game_light, (0, 0))
         else:
             screen.blit(game_dark, (0, 0))
         display_grid(screen, grid, assets)
 
-        # Display additional game info
+
         font = pygame.font.Font(None, 36)
-        #print(prev_moves)
-        if prev_moves == []:
-            pass
-        else:
-            prev_moves_text = font.render(f"{''.join(prev_moves)}", True, (121,78,7))
-            screen.blit(prev_moves_text, (315,583))
+        if prev_moves:
+            prev_moves_text = font.render(f"{''.join(prev_moves)}", True, (121, 78, 7))
+            screen.blit(prev_moves_text, (315, 583))
         moves_text = font.render(f"{num_moves}", True, (121, 78, 7))
-        screen.blit(moves_text, (315,623))
+        screen.blit(moves_text, (315, 623))
         points_text = font.render(f"{points}", True, (121, 78, 7))
         screen.blit(points_text, (315, 668))
 
-
-        #print(points)
-        if is_game_over(grid):
-            if check_if_win_or_lose(grid) == True and mode == "light":
-                screen.blit(win_light,(0,0))
-            elif check_if_win_or_lose(grid) == False and mode == "light":
-                screen.blit(lose_light,(0,0))
-            elif check_if_win_or_lose(grid) == True and mode == "dark":
-                screen.blit(win_dark,(0,0))
+        if is_game_over(grid, num_moves):
+            if check_if_win_or_lose(grid) and mode == "light":
+                screen.blit(win_light, (0, 0))
+            elif not check_if_win_or_lose(grid) and mode == "light":
+                screen.blit(lose_light, (0, 0))
+            elif check_if_win_or_lose(grid) and mode == "dark":
+                screen.blit(win_dark, (0, 0))
             else:
-                screen.blit(lose_dark,(0,0))
-            display_grid(screen,grid,assets)
+                screen.blit(lose_dark, (0, 0))
+            display_grid(screen, grid, assets)
 
-            if len(''.join(prev_moves)) == 1:
-                points = (sum(row.count('🪺') for row in grid)) * 10
-                prev_moves_text = font.render(f"{''.join(prev_moves)}", True, (121,78,7))
-                moves_text = font.render(f"{num_moves}", True, (121, 78, 7))
-                points_text = font.render(f"{points + num_moves * 2}", True, (121, 78, 7))
-                screen.blit(prev_moves_text, (315,583))
-                screen.blit(moves_text, (315,623))
-                screen.blit(points_text, (315, 668))
 
+            prev_moves_text = font.render(f"{''.join(prev_moves)}", True, (121, 78, 7))
+            moves_text = font.render(f"{num_moves}", True, (121, 78, 7))
+            if check_if_win_or_lose(grid):  
+                points = points + num_moves * 2
+                points_text = font.render(f"{points}", True, (121, 78, 7))
             else:
-                prev_moves_text = font.render(f"{''.join(prev_moves)}", True, (121,78,7))
-                moves_text = font.render(f"{num_moves}", True, (121, 78, 7))
-                points_text = font.render(f"{points + num_moves * 2}", True, (121, 78, 7))
-                screen.blit(prev_moves_text, (315,583))
-                screen.blit(moves_text, (315,623))
-                screen.blit(points_text, (315, 668))
+                points_text = font.render(f"{points}", True, (121, 78, 7))
+            change_leaderboard(filename, points)
+            screen.blit(prev_moves_text, (315, 583))
+            screen.blit(moves_text, (315, 623))
+            screen.blit(points_text, (315, 668))
+
+            pygame.display.flip()
+            while True:
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == KEYDOWN:
+                        if event.key == K_DELETE:
+                            start_gui_with_level(filename, mode)
 
 
         pygame.display.flip()
         clock.tick(FPS)
-
 
     pygame.quit()
     sys.exit()
